@@ -10,6 +10,7 @@ namespace BattagliaNavale_5H_Gruppo4
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("I'm a server!");
         }
     }
 }
