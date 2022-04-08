@@ -79,5 +79,10 @@ namespace BattagliaNavale_5H_Gruppo4.Models
                 Console.WriteLine($"Client number {_count} has disconnected!");
 
         }
+
+        protected override void OnMessage(MessageEventArgs e)
+        {
+            base.OnMessage(e);
+        }
     }
 }
