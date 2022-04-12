@@ -82,7 +82,9 @@ namespace BattagliaNavale_5H_Gruppo4.Models
 
         protected override void OnMessage(MessageEventArgs e)
         {
-            base.OnMessage(e);
+            Console.WriteLine("Message recived from the client: " + e.Data);
+
+
         }
     }
 }
