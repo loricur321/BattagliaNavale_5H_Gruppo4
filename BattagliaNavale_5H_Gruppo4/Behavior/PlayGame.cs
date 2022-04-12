@@ -23,6 +23,11 @@ namespace BattagliaNavale_5H_Gruppo4.Models
         //List of connected clients
         private static List<WebSocket> _clientSockets = new List<WebSocket>();
 
+        //Positions of the ships of the first client
+        private Ship[] _shipFirstClient;
+        //Positions of the ships of the second client
+        private Ship[] _shipSecondClient;
+
         //number of clients 
         static int _count = 0;
 
@@ -94,8 +99,32 @@ namespace BattagliaNavale_5H_Gruppo4.Models
             if (client != _clientSockets[0])
                 client = _clientSockets[1];
 
-            //When i receive a message from a client i have to suppose that it'll be the preformed json so i can deseriale it
+            //When i receive a message from a client i have to suppose that it'll be the preformed json so i can deserialize it
             ClientMessage msg = JsonConvert.DeserializeObject<ClientMessage>(e.Data);
+
+            //The message from the client can have two status (type): 3 or 4
+            //Type 3 is the message that i receive when the two client connects and send me the positions of their ships
+            //Type 4 is the message that i receive when a client makes a move, so it has only the name of thr table choosen
+            //and i need to answer hit or miss
+            
+            
+            if(msg.type == 3) //Client has sent the positions of the ships so i need to save them
+            {
+                SaveShips(msg, client);
+            }
+        }
+
+        /// <summary>
+        /// Method that will proceed to save the ships of the client
+        /// </summary>
+        /// <param name="msg">message received from the client</param>
+        /// <param name="client">client that has sent the message</param>
+        private void SaveShips(ClientMessage msg, WebSocket client)
+        {
+            if (client == _clientSockets[0])
+                _shipFirstClient = msg.ships;
+            else
+                _shipSecondClient = msg.ships;
         }
     }
 }
