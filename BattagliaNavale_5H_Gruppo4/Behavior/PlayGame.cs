@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -80,11 +81,21 @@ namespace BattagliaNavale_5H_Gruppo4.Models
 
         }
 
+        /// <summary>
+        /// Method that will manage messagges from the two clients playing the game
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnMessage(MessageEventArgs e)
         {
-            Console.WriteLine("Message recived from the client: " + e.Data);
+            //When the server receives a message i have to check which of the two clients has send it 
+            //so that i can use that particular socket from answering
+            WebSocket client = _clientSockets[0];
 
+            if (client != _clientSockets[0])
+                client = _clientSockets[1];
 
+            //When i receive a message from a client i have to suppose that it'll be the preformed json so i can deseriale it
+            ClientMessage msg = JsonConvert.DeserializeObject<ClientMessage>(e.Data);
         }
     }
 }
