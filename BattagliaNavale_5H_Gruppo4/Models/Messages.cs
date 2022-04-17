@@ -76,7 +76,7 @@ namespace BattagliaNavale_5H_Gruppo4.Models
         /// <summary>
         /// Property that communicates that the move has hitted the other player's ships
         /// </summary>
-        private static string Hit
+        public static string Hit
         {
             get
             {
@@ -92,7 +92,7 @@ namespace BattagliaNavale_5H_Gruppo4.Models
         /// <summary>
         /// Property that comminucates of a ship has been sunken
         /// </summary>
-        private static string Sunken
+        public static string Sunken
         {
             get
             {

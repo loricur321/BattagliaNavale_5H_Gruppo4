@@ -1,9 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WebSocketSharp;
 using WebSocketSharp.Server;
 
@@ -19,14 +16,14 @@ namespace BattagliaNavale_5H_Gruppo4.Models
         //The web server has to accept the connection from the first two clients and then after that reject other connections
         //Once the clients are connected they have to communicate to the web server the positions of their battle ship
         //so that the game can start.
-        
+
         //List of connected clients
         private static List<WebSocket> _clientSockets = new List<WebSocket>();
 
         //Positions of the ships of the first client
-        private Ship[] _shipFirstClient = null;
+        ClientShips _firstClientShips;
         //Positions of the ships of the second client
-        private Ship[] _shipSecondClient = null;
+        ClientShips _secondClientShips;
 
         //number of clients 
         static int _count = 0;
@@ -42,11 +39,11 @@ namespace BattagliaNavale_5H_Gruppo4.Models
             Console.WriteLine($"Request of connection from the client number {_count}. Let's see if i can accept him...");
 
             //I can only accept two players at a time
-            if(_count > 2)
+            if (_count > 2)
             {
                 Console.WriteLine($"Cannot accept client number {_count}... Closing connection");
                 string closeString = "Server cannot accept anymore clients!";
-                
+
                 //Action<bool> completed;
                 //newClient.SendAsync(closeString, completed);
 
@@ -113,7 +110,7 @@ namespace BattagliaNavale_5H_Gruppo4.Models
                 SaveShips(msg, client);
 
                 //If both clients have sent the position of the ships i need to send a message that signals the start of the game
-                if (_shipFirstClient != null && _shipSecondClient != null)
+                if (_firstClientShips.IsFull && _secondClientShips.IsFull)
                 {
                     foreach (var c in _clientSockets)
                         c.Send(Messages.StartGame);
@@ -121,9 +118,69 @@ namespace BattagliaNavale_5H_Gruppo4.Models
             }
             else if (msg.type == 5) //Client has made a move so i need to check if any rival ships were hitted and if they are all sunken
             {
+                //If a client hits a ship i replace the name of the slot with "HIT" and then send a messagge to the client 
+                //If a client doens't hit anything i'll just send the message signaling the miss
 
+                bool hit = false;
+
+                if (client == _firstClientShips.Client)
+                {
+                    foreach (var s in _secondClientShips.Ships)
+                        for (int i = 0; i < s.positions.Length; i++)
+                            if (s.positions[i] == msg.move)
+                            {
+                                s.positions[i] = "HIT";
+                                hit = true;
+                            }
+                }
+                else
+                {
+                    foreach (var s in _firstClientShips.Ships)
+                        for (int i = 0; i < s.positions.Length; i++)
+                            if (s.positions[i] == msg.move)
+                            {
+                                s.positions[i] = "HIT";
+                                hit = true;
+                            }
+                }
+
+                //If the flag hit is true it means that the client has hitted a part pf a ship so i need to let him know that
+                //Is the flag is false i need to signal the client that he hasn't hitted anything
+                if (hit)
+                    client.Send(Messages.Hit);
+                else
+                    client.Send(Messages.Miss);
+
+                //Now that i've checked the move i need to verify if any ships has been sunken
+                CheckShips(client);
             }
 
+        }
+
+        /// <summary>
+        /// Method that will check if a ships is sunken
+        /// </summary>
+        private void CheckShips(WebSocket client)
+        {
+            //I receive the client that has made the move so i only need to check the other ships client
+            //because that's where i've worked before
+            WebSocket rivalClient;
+
+            if (client == _clientSockets[0])
+                rivalClient = _clientSockets[1];
+            else
+                rivalClient = _clientSockets[0];
+
+            bool sunken = false;
+
+            if (rivalClient == _firstClientShips.Client)
+            {
+                
+            }
+            else
+            {
+                
+            }
         }
 
         /// <summary>
@@ -134,9 +191,15 @@ namespace BattagliaNavale_5H_Gruppo4.Models
         private void SaveShips(ClientMessage msg, WebSocket client)
         {
             if (client == _clientSockets[0])
-                _shipFirstClient = msg.ships;
+            {
+                //First Client
+                _firstClientShips = new ClientShips(true, client, msg.ships);
+            }
             else
-                _shipSecondClient = msg.ships;
+            {
+                //Second client
+                _secondClientShips = new ClientShips(true, client, msg.ships);
+            }
         }
     }
 }

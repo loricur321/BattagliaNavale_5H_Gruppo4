@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="Behavior\PlayGame.cs" />
     <Compile Include="Models\ClientMessage.cs" />
+    <Compile Include="Models\ClientShips.cs" />
     <Compile Include="Models\Messages.cs" />
     <Compile Include="Models\ServerMessage.cs" />
     <Compile Include="Program.cs" />
