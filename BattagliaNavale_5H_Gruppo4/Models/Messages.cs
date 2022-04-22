@@ -99,7 +99,7 @@ namespace BattagliaNavale_5H_Gruppo4.Models
                 ServerMessage msg = new ServerMessage
                 {
                     type = 3,
-                    response = "Ship sunken"
+                    shipStatus = "Ship sunken"
                 };
                 return JsonConvert.SerializeObject(msg, Formatting.Indented);
             }

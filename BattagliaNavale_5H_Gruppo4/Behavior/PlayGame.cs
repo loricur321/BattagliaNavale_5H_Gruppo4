@@ -153,8 +153,60 @@ namespace BattagliaNavale_5H_Gruppo4.Models
 
                 //Now that i've checked the move i need to verify if any ships has been sunken
                 CheckShips(client);
+
+                //Now i can see if the fame is over
+                CheckGameStatus();
             }
 
+        }
+
+        /// <summary>
+        /// This method will check if one of the clients has all the ship sunken
+        /// In that case i will signal che win of the other client
+        /// </summary>
+        private void CheckGameStatus()
+        {
+            //Check of the first client
+            int sunkenShip = 0;
+
+            int hitCounter = 0;
+            foreach (var ship in _firstClientShips.Ships)
+            {
+                foreach (var pos in ship.positions)
+                    if (pos == "HIT")
+                        hitCounter++;
+
+                if (hitCounter == ship.positions.Length)
+                    sunkenShip++;
+            }
+
+            if(sunkenShip == _firstClientShips.Ships.Length)
+            {
+                //Client 2 has won
+                _firstClientShips.Client.Send(Messages.Client2Wins);
+                _secondClientShips.Client.Send(Messages.Client2Wins);
+            }
+
+            //If the second client has't won i need to check if the first one has
+            sunkenShip = 0;
+
+            hitCounter = 0;
+            foreach (var ship in _secondClientShips.Ships)
+            {
+                foreach (var pos in ship.positions)
+                    if (pos == "HIT")
+                        hitCounter++;
+
+                if (hitCounter == ship.positions.Length)
+                    sunkenShip++;
+            }
+
+            if (sunkenShip == _secondClientShips.Ships.Length)
+            {
+                //Client 1 has won
+                _firstClientShips.Client.Send(Messages.Client1Wins);
+                _secondClientShips.Client.Send(Messages.Client1Wins);
+            }
         }
 
         /// <summary>
@@ -171,16 +223,37 @@ namespace BattagliaNavale_5H_Gruppo4.Models
             else
                 rivalClient = _clientSockets[0];
 
-            bool sunken = false;
+            int sunkenShip = 0;
 
             if (rivalClient == _firstClientShips.Client)
             {
-                
+                int hitCounter = 0;
+                foreach (var ship in _firstClientShips.Ships)
+                {
+                    foreach (var pos in ship.positions)
+                        if (pos == "HIT")
+                            hitCounter++;
+
+                    if(hitCounter == ship.positions.Length)
+                        sunkenShip++;
+                }
             }
             else
             {
-                
+                int hitCounter = 0;
+                foreach (var ship in _secondClientShips.Ships)
+                {
+                    foreach (var pos in ship.positions)
+                        if (pos == "HIT")
+                            hitCounter++;
+
+                    if (hitCounter == ship.positions.Length)
+                        sunkenShip++;
+                }
             }
+
+            //If the players has a sunken ship or more then one i will send him a message
+            client.Send(Messages.Sunken);
         }
 
         /// <summary>
