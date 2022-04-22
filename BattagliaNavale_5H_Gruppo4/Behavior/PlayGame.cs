@@ -118,31 +118,10 @@ namespace BattagliaNavale_5H_Gruppo4.Models
             }
             else if (msg.type == 5) //Client has made a move so i need to check if any rival ships were hitted and if they are all sunken
             {
-                //If a client hits a ship i replace the name of the slot with "HIT" and then send a messagge to the client 
-                //If a client doens't hit anything i'll just send the message signaling the miss
+                //Now that i've checked the move i need to verify if any ships has been sunken
+                CheckShips(client);
 
-                bool hit = false;
-
-                if (client == _firstClientShips.Client)
-                {
-                    foreach (var s in _secondClientShips.Ships)
-                        for (int i = 0; i < s.positions.Length; i++)
-                            if (s.positions[i] == msg.move)
-                            {
-                                s.positions[i] = "HIT";
-                                hit = true;
-                            }
-                }
-                else
-                {
-                    foreach (var s in _firstClientShips.Ships)
-                        for (int i = 0; i < s.positions.Length; i++)
-                            if (s.positions[i] == msg.move)
-                            {
-                                s.positions[i] = "HIT";
-                                hit = true;
-                            }
-                }
+                bool hit = CheckHit(client, msg);
 
                 //If the flag hit is true it means that the client has hitted a part pf a ship so i need to let him know that
                 //Is the flag is false i need to signal the client that he hasn't hitted anything
@@ -151,13 +130,46 @@ namespace BattagliaNavale_5H_Gruppo4.Models
                 else
                     client.Send(Messages.Miss);
 
-                //Now that i've checked the move i need to verify if any ships has been sunken
-                CheckShips(client);
-
                 //Now i can see if the fame is over
                 CheckGameStatus();
             }
 
+        }
+
+
+        /// <summary>
+        /// In this method i will check if the move of a client has hitted anything
+        /// </summary>
+        /// <param name="client">Client that has made the move</param>
+        /// <param name="msg">msg of the client</param>
+        /// <returns>true if the client has hitted the ship, false otherwise</returns>
+        private bool CheckHit(WebSocket client, ClientMessage msg)
+        {
+            //If a client hits a ship i replace the name of the slot with "HIT" and then send a messagge to the client 
+            //If a client doens't hit anything i'll just send the message signaling the miss
+            bool hit = false;
+            if (client == _firstClientShips.Client)
+            {
+                foreach (var s in _secondClientShips.Ships)
+                    for (int i = 0; i < s.positions.Length; i++)
+                        if (s.positions[i] == msg.move)
+                        {
+                            s.positions[i] = "HIT";
+                            hit = true;
+                        }
+            }
+            else
+            {
+                foreach (var s in _firstClientShips.Ships)
+                    for (int i = 0; i < s.positions.Length; i++)
+                        if (s.positions[i] == msg.move)
+                        {
+                            s.positions[i] = "HIT";
+                            hit = true;
+                        }
+            }
+
+            return hit;
         }
 
         /// <summary>
