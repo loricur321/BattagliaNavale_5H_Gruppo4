@@ -253,7 +253,7 @@ namespace BattagliaNavale_5H_Gruppo4.Models
             }
 
             //If the players has a sunken ship or more then one i will send him a message
-            client.Send(Messages.Sunken);
+            rivalClient.Send(Messages.Sunken);
         }
 
         /// <summary>
