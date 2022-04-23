@@ -121,14 +121,7 @@ namespace BattagliaNavale_5H_Gruppo4.Models
                 //Now that i've checked the move i need to verify if any ships has been sunken
                 CheckShips(client);
 
-                bool hit = CheckHit(client, msg);
-
-                //If the flag hit is true it means that the client has hitted a part pf a ship so i need to let him know that
-                //Is the flag is false i need to signal the client that he hasn't hitted anything
-                if (hit)
-                    client.Send(Messages.Hit);
-                else
-                    client.Send(Messages.Miss);
+                CheckHit(client, msg);                
 
                 //Now i can see if the fame is over
                 CheckGameStatus();
@@ -143,7 +136,7 @@ namespace BattagliaNavale_5H_Gruppo4.Models
         /// <param name="client">Client that has made the move</param>
         /// <param name="msg">msg of the client</param>
         /// <returns>true if the client has hitted the ship, false otherwise</returns>
-        private bool CheckHit(WebSocket client, ClientMessage msg)
+        private void CheckHit(WebSocket client, ClientMessage msg)
         {
             //If a client hits a ship i replace the name of the slot with "HIT" and then send a messagge to the client 
             //If a client doens't hit anything i'll just send the message signaling the miss
@@ -169,7 +162,12 @@ namespace BattagliaNavale_5H_Gruppo4.Models
                         }
             }
 
-            return hit;
+            //If the flag hit is true it means that the client has hitted a part pf a ship so i need to let him know that
+            //Is the flag is false i need to signal the client that he hasn't hitted anything
+            if (hit)
+                client.Send(Messages.Hit);
+            else
+                client.Send(Messages.Miss);
         }
 
         /// <summary>
