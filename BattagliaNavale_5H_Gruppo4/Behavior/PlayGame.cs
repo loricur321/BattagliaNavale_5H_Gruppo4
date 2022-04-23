@@ -100,8 +100,8 @@ namespace BattagliaNavale_5H_Gruppo4.Models
             ClientMessage msg = JsonConvert.DeserializeObject<ClientMessage>(e.Data);
 
             //The message from the client can have two status (type): 4 or 5
-            //Type 3 is the message that i receive when the two client connects and send me the positions of their ships
-            //Type 4 is the message that i receive when a client makes a move, so it has only the name of thr table choosen
+            //Type 4 is the message that i receive when the two client connects and send me the positions of their ships
+            //Type 5 is the message that i receive when a client makes a move, so it has only the name of thr table choosen
             //and i need to answer hit or miss
 
 
