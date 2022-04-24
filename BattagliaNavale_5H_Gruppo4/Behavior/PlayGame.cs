@@ -88,7 +88,7 @@ namespace BattagliaNavale_5H_Gruppo4.Models
         {
             //When the server receives a message i have to check which of the two clients has send it 
             //so that i can use that particular socket from answering
-            WebSocket client = _clientSockets[0];
+            WebSocket client = Context.WebSocket;
 
             if (client != _clientSockets[0])
                 client = _clientSockets[1];
