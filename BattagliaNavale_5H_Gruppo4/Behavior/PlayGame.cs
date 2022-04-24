@@ -44,9 +44,6 @@ namespace BattagliaNavale_5H_Gruppo4.Models
                 Console.WriteLine($"Cannot accept client number {_count}... Closing connection");
                 string closeString = "Server cannot accept anymore clients!";
 
-                //Action<bool> completed;
-                //newClient.SendAsync(closeString, completed);
-
                 newClient.Send(closeString);
 
                 //Close the connection with the client
@@ -107,17 +104,20 @@ namespace BattagliaNavale_5H_Gruppo4.Models
 
             if (msg.type == 4) //Client has sent the positions of the ships so i need to save them
             {
+                Console.WriteLine("Saving the ships of a Client....");
                 SaveShips(msg, client);
 
                 //If both clients have sent the position of the ships i need to send a message that signals the start of the game
                 if (_firstClientShips.IsFull && _secondClientShips.IsFull)
                 {
+                    Console.WriteLine("Starting the game....");
                     foreach (var c in _clientSockets)
                         c.Send(Messages.StartGame);
                 }
             }
             else if (msg.type == 5) //Client has made a move so i need to check if any rival ships were hitted and if they are all sunken
             {
+                Console.WriteLine("A client has made a move! Checking the status of ships and game....");
                 //First of all I'm gonna check if any ship will become sunken after the move
                 CheckShips(client, msg.move);
 
@@ -162,7 +162,10 @@ namespace BattagliaNavale_5H_Gruppo4.Models
                 // If the counter return a value equal to the lenght less 1 it means that only a position was not hitted in the ship
                 // and by checking the move it means that it has been hitted now 
                 if (hitCounter == _firstClientShips.Ships[indexShip].positions.Length - 1)
+                {
                     rivalClient.Send(Messages.Sunken);
+                    Console.WriteLine("A client ship has been sunken!");
+                }
             }
             else
             {
@@ -183,7 +186,10 @@ namespace BattagliaNavale_5H_Gruppo4.Models
                 // If the counter return a value equal to the lenght less 1 it means that only a position was not hitted in the ship
                 // and by checking the move it means that it has been hitted now 
                 if (hitCounter == _secondClientShips.Ships[indexShip].positions.Length - 1)
+                {
                     rivalClient.Send(Messages.Sunken);
+                    Console.WriteLine("A client ship has been sunken!");
+                }
             }
         }
 
@@ -222,9 +228,15 @@ namespace BattagliaNavale_5H_Gruppo4.Models
             //If the flag hit is true it means that the client has hitted a part pf a ship so i need to let him know that
             //Is the flag is false i need to signal the client that he hasn't hitted anything
             if (hit)
+            {
                 client.Send(Messages.Hit);
+                Console.WriteLine("Client has hitted a rival ship!");
+            }
             else
+            {
                 client.Send(Messages.Miss);
+                Console.WriteLine("Client has't hitted any rival ships!");
+            }
         }
 
         /// <summary>
@@ -250,6 +262,7 @@ namespace BattagliaNavale_5H_Gruppo4.Models
             if(sunkenShip == _firstClientShips.Ships.Length)
             {
                 //Client 2 has won
+                Console.WriteLine("Client 2 has won!");
                 _firstClientShips.Client.Send(Messages.Client2Wins);
                 _secondClientShips.Client.Send(Messages.Client2Wins);
             }
@@ -271,6 +284,7 @@ namespace BattagliaNavale_5H_Gruppo4.Models
             if (sunkenShip == _secondClientShips.Ships.Length)
             {
                 //Client 1 has won
+                Console.WriteLine("Client 1 has won!");
                 _firstClientShips.Client.Send(Messages.Client1Wins);
                 _secondClientShips.Client.Send(Messages.Client1Wins);
             }
