@@ -15,7 +15,10 @@ namespace BattagliaNavale_5H_Gruppo4.Models
 
         public Ship[] Ships { get; set; }
 
-        public ClientShips () { }
+        public ClientShips () 
+        {
+            IsFull = false;
+        }
 
         public ClientShips (bool isFull, WebSocket client, Ship[] ship)
         {

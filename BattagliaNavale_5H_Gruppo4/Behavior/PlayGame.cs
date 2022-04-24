@@ -21,9 +21,9 @@ namespace BattagliaNavale_5H_Gruppo4.Models
         private static List<WebSocket> _clientSockets = new List<WebSocket>();
 
         //Positions of the ships of the first client
-        ClientShips _firstClientShips;
+        ClientShips _firstClientShips = new ClientShips();
         //Positions of the ships of the second client
-        ClientShips _secondClientShips;
+        ClientShips _secondClientShips = new ClientShips();
 
         //number of clients 
         static int _count = 0;
