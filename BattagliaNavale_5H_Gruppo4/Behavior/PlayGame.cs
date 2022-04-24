@@ -118,17 +118,74 @@ namespace BattagliaNavale_5H_Gruppo4.Models
             }
             else if (msg.type == 5) //Client has made a move so i need to check if any rival ships were hitted and if they are all sunken
             {
-                //Now that i've checked the move i need to verify if any ships has been sunken
-                CheckShips(client);
+                //First of all I'm gonna check if any ship will become sunken after the move
+                CheckShips(client, msg.move);
 
-                CheckHit(client, msg);                
+                CheckHit(client, msg); //After that i can change the status of the ship to "HIT" if necessary
 
-                //Now i can see if the fame is over
+                //At the end I will check if the game has come to and end
                 CheckGameStatus();
             }
 
         }
 
+        /// <summary>
+        /// Method that will check if a ships is sunken
+        /// </summary>
+        private void CheckShips(WebSocket client, string move)
+        {
+            //I receive the client that has made the move so i only need to check the other ships client
+            //because that's where i've worked before
+            WebSocket rivalClient;
+
+            if (client == _clientSockets[0])
+                rivalClient = _clientSockets[1];
+            else
+                rivalClient = _clientSockets[0];
+
+            if (rivalClient == _firstClientShips.Client)
+            {
+                int indexShip = -1; //index of the ship that may have received a hit 
+                for(int i = 0; i < _firstClientShips.Ships.Length; i++) 
+                    foreach(var pos in _firstClientShips.Ships[i].positions)
+                        if (pos.Contains(move))
+                            indexShip = i; //in case the ships contain a positions which is equal to the move I'll save the index of the ship
+
+                int hitCounter = 0;
+
+                //I'm gonna check hoe many hit there are in the hitted positons
+                if(indexShip != -1) //if indexShip is -1 it means that there was no hit
+                    foreach (var pos in _firstClientShips.Ships[indexShip].positions)
+                        if (pos == "HIT")
+                            hitCounter++;
+
+                // If the counter return a value equal to the lenght less 1 it means that only a position was not hitted in the ship
+                // and by checking the move it means that it has been hitted now 
+                if (hitCounter == _firstClientShips.Ships[indexShip].positions.Length - 1)
+                    rivalClient.Send(Messages.Sunken);
+            }
+            else
+            {
+                int indexShip = -1; //index of the ship that may have received a hit 
+                for (int i = 0; i < _secondClientShips.Ships.Length; i++)
+                    foreach (var pos in _secondClientShips.Ships[i].positions)
+                        if (pos.Contains(move))
+                            indexShip = i; //in case the ships contain a positions which is equal to the move I'll save the index of the ship
+
+                int hitCounter = 0;
+
+                //I'm gonna check hoe many hit there are in the hitted positons
+                if (indexShip != -1) //if indexShip is -1 it means that there was no hit
+                    foreach (var pos in _secondClientShips.Ships[indexShip].positions)
+                        if (pos == "HIT")
+                            hitCounter++;
+
+                // If the counter return a value equal to the lenght less 1 it means that only a position was not hitted in the ship
+                // and by checking the move it means that it has been hitted now 
+                if (hitCounter == _secondClientShips.Ships[indexShip].positions.Length - 1)
+                    rivalClient.Send(Messages.Sunken);
+            }
+        }
 
         /// <summary>
         /// In this method i will check if the move of a client has hitted anything
@@ -217,53 +274,6 @@ namespace BattagliaNavale_5H_Gruppo4.Models
                 _firstClientShips.Client.Send(Messages.Client1Wins);
                 _secondClientShips.Client.Send(Messages.Client1Wins);
             }
-        }
-
-        /// <summary>
-        /// Method that will check if a ships is sunken
-        /// </summary>
-        private void CheckShips(WebSocket client)
-        {
-            //I receive the client that has made the move so i only need to check the other ships client
-            //because that's where i've worked before
-            WebSocket rivalClient;
-
-            if (client == _clientSockets[0])
-                rivalClient = _clientSockets[1];
-            else
-                rivalClient = _clientSockets[0];
-
-            int sunkenShip = 0;
-
-            if (rivalClient == _firstClientShips.Client)
-            {
-                int hitCounter = 0;
-                foreach (var ship in _firstClientShips.Ships)
-                {
-                    foreach (var pos in ship.positions)
-                        if (pos == "HIT")
-                            hitCounter++;
-
-                    if(hitCounter == ship.positions.Length)
-                        sunkenShip++;
-                }
-            }
-            else
-            {
-                int hitCounter = 0;
-                foreach (var ship in _secondClientShips.Ships)
-                {
-                    foreach (var pos in ship.positions)
-                        if (pos == "HIT")
-                            hitCounter++;
-
-                    if (hitCounter == ship.positions.Length)
-                        sunkenShip++;
-                }
-            }
-
-            //If the players has a sunken ship or more then one i will send him a message
-            rivalClient.Send(Messages.Sunken);
         }
 
         /// <summary>
