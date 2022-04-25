@@ -148,7 +148,7 @@ namespace BattagliaNavale_5H_Gruppo4.Models
                 int indexShip = -1; //index of the ship that may have received a hit 
                 for(int i = 0; i < _firstClientShips.Ships.Length; i++) 
                     foreach(var pos in _firstClientShips.Ships[i].positions)
-                        if (pos.Contains(move))
+                        if (pos == move.ToUpper())
                             indexShip = i; //in case the ships contain a positions which is equal to the move I'll save the index of the ship
 
                 int hitCounter = 0;
@@ -161,18 +161,19 @@ namespace BattagliaNavale_5H_Gruppo4.Models
 
                 // If the counter return a value equal to the lenght less 1 it means that only a position was not hitted in the ship
                 // and by checking the move it means that it has been hitted now 
-                if (hitCounter == _firstClientShips.Ships[indexShip].positions.Length - 1)
-                {
-                    rivalClient.Send(Messages.Sunken);
-                    Console.WriteLine("A client ship has been sunken!");
-                }
+                if(indexShip != -1)
+                    if (hitCounter == _firstClientShips.Ships[indexShip].positions.Length - 1)
+                    {
+                        rivalClient.Send(Messages.Sunken);
+                        Console.WriteLine("A client ship has been sunken!");
+                    }
             }
             else
             {
                 int indexShip = -1; //index of the ship that may have received a hit 
                 for (int i = 0; i < _secondClientShips.Ships.Length; i++)
                     foreach (var pos in _secondClientShips.Ships[i].positions)
-                        if (pos.Contains(move))
+                        if (pos == move.ToUpper())
                             indexShip = i; //in case the ships contain a positions which is equal to the move I'll save the index of the ship
 
                 int hitCounter = 0;
@@ -185,11 +186,12 @@ namespace BattagliaNavale_5H_Gruppo4.Models
 
                 // If the counter return a value equal to the lenght less 1 it means that only a position was not hitted in the ship
                 // and by checking the move it means that it has been hitted now 
-                if (hitCounter == _secondClientShips.Ships[indexShip].positions.Length - 1)
-                {
-                    rivalClient.Send(Messages.Sunken);
-                    Console.WriteLine("A client ship has been sunken!");
-                }
+                if(indexShip != -1)
+                    if (hitCounter == _secondClientShips.Ships[indexShip].positions.Length - 1 && indexShip != -1)
+                    {
+                        rivalClient.Send(Messages.Sunken);
+                        Console.WriteLine("A client ship has been sunken!");
+                    }
             }
         }
 
@@ -208,7 +210,7 @@ namespace BattagliaNavale_5H_Gruppo4.Models
             {
                 foreach (var s in _secondClientShips.Ships)
                     for (int i = 0; i < s.positions.Length; i++)
-                        if (s.positions[i] == msg.move)
+                        if (s.positions[i] == msg.move.ToUpper())
                         {
                             s.positions[i] = "HIT";
                             hit = true;
@@ -218,7 +220,7 @@ namespace BattagliaNavale_5H_Gruppo4.Models
             {
                 foreach (var s in _firstClientShips.Ships)
                     for (int i = 0; i < s.positions.Length; i++)
-                        if (s.positions[i] == msg.move)
+                        if (s.positions[i] == msg.move.ToUpper())
                         {
                             s.positions[i] = "HIT";
                             hit = true;
